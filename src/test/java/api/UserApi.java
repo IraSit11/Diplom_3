@@ -1,9 +1,11 @@
+package api;
+
+import data.Url;
+import data.User;
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
 import static io.restassured.RestAssured.given;
-import static org.apache.http.HttpStatus.*;
-import static org.hamcrest.CoreMatchers.equalTo;
 
 public class UserApi {
 

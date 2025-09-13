@@ -1,3 +1,11 @@
+package tests;
+
+import base.BaseTest;
+import com.github.javafaker.Faker;
+import data.LoginPage;
+import data.PageMain;
+import data.RegisterPage;
+import data.User;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
@@ -8,58 +16,39 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-
-
+import api.UserApi;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class TestRegisterUser extends BaseTest {
+
     UserApi userApi = new UserApi();
 
-    private WebDriver driver ;
-    private final String browser;
+    private WebDriver driver;
 
-    private final String name;
-    private final String email;
-    private final String password;
+    @Parameterized.Parameter(0)
+    public String name;
 
+    @Parameterized.Parameter(1)
+    public String email;
 
-
-    public TestRegisterUser (String browser, String name, String email,String password) {
-        this.browser = browser;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-    }
+    @Parameterized.Parameter(2)
+    public String password;
 
     @Before
-    public void setBrowser () throws InterruptedException {
-
-        if (browser.equalsIgnoreCase("chrome")) {
-            WebDriverManager.chromedriver().setup();
-            ChromeOptions options = new ChromeOptions();
-            driver = new ChromeDriver(options);
-        } else if (browser.equalsIgnoreCase("yandex")) {
-            WebDriverManager.chromedriver().driverVersion("138.0.7163.0").setup();
-            ChromeOptions options = new ChromeOptions();
-            options.setBinary("C:\\Users\\Ira\\AppData\\Local\\Yandex\\YandexBrowser\\Application\\browser.exe");
-            driver = new ChromeDriver(options);
-        }
-        Thread.sleep(2000);
-
+    public void setUp() {
+        driver = BaseTest.getDriver();
     }
 
-    @Parameterized.Parameters (name = "Браузер: {0}, Имя: {1}, Email: {2}, Пароль: {3}")
+
+    @Parameterized.Parameters (name = "Имя: {0}, Email: {1}, Пароль: {2}")
     public static Object[][] getRegisterDetails() {
+        Faker faker = new Faker();
+
         return new Object[][]{
-                {"chrome", "Петр", "petrovPetr13_12@yandex.ru", "666666"},
-                {"yandex", "Петр", "petrovPetr13_12@yandex.ru", "666666"},
-                {"chrome", "Петр", "petrovPetr13_12@yandex.ru", "1234567"},
-                {"yandex", "Петр", "petrovPetr13_12@yandex.ru", "1234567"},
-                {"chrome", "Петр", "petrovPetr13_12@yandex.ru", "1616161616"},
-                {"yandex", "Петр", "petrovPetr13_12@yandex.ru", "1616161616",},
+                {faker.name().firstName(), faker.internet().emailAddress(), faker.internet().password(6,7)},
+                {faker.name().firstName(), faker.internet().emailAddress(), faker.internet().password(7,8)},
+                {faker.name().firstName(), faker.internet().emailAddress(), faker.internet().password(10,11)},
 
         };
     }
@@ -88,7 +77,7 @@ public class TestRegisterUser extends BaseTest {
     }
 
 @After
-public void tearDown() throws InterruptedException {
+public void tearDown() {
         User authUser = new User();
         authUser.setEmail(email);
         authUser.setPassword(password);
@@ -98,7 +87,5 @@ public void tearDown() throws InterruptedException {
         if(accessToken != null) {
              userApi.deleteUser(accessToken);
         }
-    driver.quit();
-    Thread.sleep(1000);
-}
+    }
 }

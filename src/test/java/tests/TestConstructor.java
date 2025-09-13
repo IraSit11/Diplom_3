@@ -1,53 +1,27 @@
-import io.github.bonigarcia.wdm.WebDriverManager;
+package tests;
+
+import base.BaseTest;
+import data.PageMain;
 import io.qameta.allure.junit4.DisplayName;
 import jdk.jfr.Description;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+
 
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(Parameterized.class)
-public class TestConstructor  {
+public class TestConstructor extends BaseTest {
 
     private WebDriver driver;
-    private final String browser;
 
-
-    public TestConstructor(String browser) {
-        this.browser = browser;
-    }
 
     @Before
-    public void setBrowser () throws InterruptedException {
-
-        if (browser.equalsIgnoreCase("chrome")) {
-            WebDriverManager.chromedriver().setup();
-            ChromeOptions options = new ChromeOptions();
-            driver = new ChromeDriver(options);
-        } else if (browser.equalsIgnoreCase("yandex")) {
-            WebDriverManager.chromedriver().driverVersion("138.0.7163.0").setup();
-            ChromeOptions options = new ChromeOptions();
-            options.setBinary("C:\\Users\\Ira\\AppData\\Local\\Yandex\\YandexBrowser\\Application\\browser.exe");
-            driver = new ChromeDriver(options);
-        }
-
-        Thread.sleep(1000);
+    public void setUp() {
+        driver = BaseTest.getDriver();
     }
 
-    @Parameterized.Parameters (name = "Браузер: {0}")
-    public static Object[][] choiceBrowser() {
-        return new Object[][]{
-                {"chrome"},
-                {"yandex"},
-        };
-    }
 
     @Test
     @DisplayName("Проверка перехода к разделу <Булки>")
@@ -103,14 +77,5 @@ public class TestConstructor  {
         assertEquals(expectedText, actualText);
 
     }
-
-
-    @After
-    public void tearDown() throws InterruptedException {
-        driver.quit();
-        Thread.sleep(1500);
-
-    }
-
 
 }
